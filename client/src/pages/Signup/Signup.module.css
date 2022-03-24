@@ -1,0 +1,16 @@
+.signup {
+    margin: 1rem auto;
+    width: fit-content;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: fit-content;
+}
+
+.form input,
+.form button {
+    font-size: 1.2rem;
+}

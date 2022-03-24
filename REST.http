@@ -1,0 +1,23 @@
+GET http://localhost:5000/api/users
+
+### Create user
+POST http://localhost:5000/api/auth/signup
+Content-Type: application/json
+
+{
+    "name": "Ashish",
+    "email": "ashish@ashish.person",
+    "password": "ashish757"
+}
+
+### Login the user
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "ashish@ashish.person",
+    "password": "ashish757"
+}
+
+### get a user 
+GET http://localhost:5000/api/user/6217b58fb5a837fb8cb22de6

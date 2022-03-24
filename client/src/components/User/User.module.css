@@ -1,0 +1,43 @@
+.userCard {
+  display: flex;
+  align-items: center;
+  background-color: #818cf8;
+  padding: .5rem 1rem;
+  border-radius: .2rem;
+  border: 1px solid #4338ca;
+  width: fit-content;
+}
+
+.userCard p { 
+  color: #fff;
+}
+
+.userCard small {
+  color: #eee;
+  margin-left: 1rem;
+  line-height: 1.6rem;
+  margin-right: 3rem;
+}
+
+
+.userCard button:first-of-type {
+  padding: .1rem .3rem; 
+   line-height: 1rem;
+}
+
+.userCard .likeButton svg {
+  height: 1.3rem;
+}
+
+.userCard button {
+  color: #fff;
+  background-color: #6366f1;
+  border: none;
+  outline: none;
+  padding: .3rem 1rem;
+  font-size: 1.2rem;
+  border-radius: .2rem;
+  letter-spacing: .1rem;
+  margin-left: 1rem;
+  cursor: pointer;
+}
