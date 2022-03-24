@@ -18,7 +18,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 
-mongoose.connect("mongodb+srv://ashish757:<password>@cluster0.sx5d0.mongodb.net/UserProfilesMERN?retryWrites=true&w=majority")
+mongoose.connect("mongodb+srv://ashish757:<pass>@cluster0.sx5d0.mongodb.net/UserProfilesMERN?retryWrites=true&w=majority")
     .then(() => app.listen(5000))
     .catch((err) => console.log(err))
 
