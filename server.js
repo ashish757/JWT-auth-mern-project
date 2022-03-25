@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cors = require("cors")
 const cookieParser = require('cookie-parser')
+const redisClient = require("./redisClient.js")
 
 const userRoutes = require('./routes/userRoutes')
 const authRoutes = require('./routes/authRoutes')
@@ -18,7 +19,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 
-mongoose.connect("mongodb+srv://ashish757:<pass>@cluster0.sx5d0.mongodb.net/UserProfilesMERN?retryWrites=true&w=majority")
+mongoose.connect("mongodb+srv://ashish757:Ashish757@cluster0.sx5d0.mongodb.net/UserProfilesMERN?retryWrites=true&w=majority")
     .then(() => app.listen(5000))
     .catch((err) => console.log(err))
 

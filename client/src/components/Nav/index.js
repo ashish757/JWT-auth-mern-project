@@ -3,29 +3,29 @@ import { Link } from 'react-router-dom'
 import ProtectedComponent from "../ProtectedComponent/ProtectedComponent"
 import { AuthContext } from "../../context"
 import { useContext } from "react"
+import useFetchPrivate from "../../hooks/useFetchPrivate"
+
 
 
 export default function Nav() {
     const {dispatch} = useContext(AuthContext)
-
+    const useFetch = useFetchPrivate()
 
     
     const Logout = async () => {
-        const res = await fetch("http://localhost:5000/api/auth/logout", {
-            method: "DELETE", 
-            credentials: "include",
-            headers: {
-                "content-type": "application/json",
-            }
-        })
+        const FetchUsers = async () => {
+            const res = await useFetch(`auth/logout`, "DELETE", {config: {credentials: "include"}})
+            
+            console.log(res);
 
-        if (res.status) {
-            dispatch({type: "REMOVE_ACCESS_TOKEN"})
+            if (res.status) {
+                dispatch({type: "REMOVE_ACCESS_TOKEN"})
             console.log("NAV LOGGEDOUT")
-
-        } else {
-            console.error(res)
+            } else {
+                console.error(res)
+            }
         }
+        FetchUsers()
     }
 
     return (

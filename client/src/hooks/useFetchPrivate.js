@@ -11,7 +11,7 @@ const useFetchPrivate = () => {
 
     if (!state.accessToken) return 
 
-    const useFetch = async (url, options, method) => {
+    const useFetch = async (url, method, options={}) => {
         // check for access token expiration and if refresh token
         const decoded = jwtDecode(state.accessToken);
         console.log(decoded.exp * 1000,  Date.now());
@@ -25,13 +25,13 @@ const useFetchPrivate = () => {
 
         const res = await fetch(`http://localhost:5000/api/${url}`, {
             method: method,
-            // credentials: "include",
             headers: {
                 "content-type": "application/json",
                 "x-access-token": state.accessToken,
                 ...options.headers
             },
-            body: JSON.stringify(options.body)
+            body: JSON.stringify(options.body),
+            ...options.config
         })
 
         return await res.json()

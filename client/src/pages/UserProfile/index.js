@@ -11,7 +11,7 @@ export default function UserProfile() {
 
     useEffect(() => {
         const FetchUsers = async () => {
-            const res = await useFetch(`user/${params.id}`, {}, "GET")
+            const res = await useFetch(`user/${params.id}`, "GET")
             console.log(res);
             if (res.status) {
                 setUser(res.user)
