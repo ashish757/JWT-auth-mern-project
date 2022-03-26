@@ -6,7 +6,7 @@ const res = require("express/lib/response")
 const redisClient = require("../redisClient.js")
 
 const createAccessToken = (payload) => {
-    return jwt.sign(payload, "ACCESSkey", {expiresIn: "1h"})
+    return jwt.sign(payload, "ACCESSkey", {expiresIn: "15s"})
 }
 
 const createRefreshToken = (payload) => {
@@ -27,7 +27,7 @@ const signup = async (req, res) => {
         
         const refreshToken = createRefreshToken({id: user._id})
 
-        await redisClient.lpush(`WHITE_${user._id}`, refreshToken)
+        redisClient.set(`WHITE_${user._id}`, JSON.stringify([refreshToken]))
 
         res.cookie("jid", refreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000, secure: true })
         return res.status(201).json({success: true, user, msg: "user created successfully", accessToken})
@@ -51,8 +51,7 @@ const login = async (req, res) => {
         
                 const refreshToken = createRefreshToken({id: user._id})
 
-                await redisClient.set(`WHITE_${user._id}`, String(refreshToken), {EX: 60 * 60 * 24})
-                // redisClient.set(`WHITE_${user._id}`, String(refreshToken), "EX", 60 * 60 * 24)
+                redisClient.set(`WHITE_${user._id}`, JSON.stringify([refreshToken]))
 
                 res.cookie("jid", refreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000, secure: true })
                 return res.json({success: true, msg: "login successful", user, accessToken})
@@ -78,7 +77,9 @@ const logout = async (req, res) => {
     const refreshToken = req.cookies.jid
 
 
-    await redisClient.del(`WHITE_${userId}`)
+    const refreshTokens = await redisClient.get(`WHITE_${userId}`)
+    const newRefreshTokens =JSON.parse(refreshTokens).filter(token => token !== refreshToken)
+    redisClient.set(`WHITE_${userId}`, JSON.stringify(newRefreshTokens))
 
     res.clearCookie("jid")
     res.json({status: true, msg:"you were logged out"})
@@ -98,9 +99,37 @@ const refreshToken = async (req, res) => {
         if (err) return res.json({status: false, msg: "invalid refresh token"})
 
         // check whether the given refersh token exists in whitelist
-        // try {
-        //     const savedRefreshToken = await redisClient.get(`WHITE_${payload.id}`)
+        try {
+            const savedRefreshTokens = await redisClient.get(`WHITE_${payload.id}`)
+            const savedRefreshToken = JSON.parse(savedRefreshTokens).filter(token => token = clientRefreshToken)
+            if (savedRefreshToken.length) {
+                    // here refersh token is valid as it is in whitelist
+                    // console.log(savedRefreshToken) //
 
+                    const accessToken = createAccessToken({id: payload._id})
+                    const refreshToken = createRefreshToken({id: payload._id})
+
+                    redisClient.set(`WHITE_${payload._id}`, JSON.stringify([refreshToken]))
+
+                    res.cookie("jid", refreshToken, { httpOnly: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000, secure: true })
+                    return res.json({ status: true, accessToken})
+
+            
+            } else {
+                // REUSE DETECTED
+                res.status(500).json({success: false, msg: "user logged out with this token but it is compromised", isUserHacked: true})
+                // res.status(500).json({success: false, msg: "SEVERE SECURITY CONCERN"})
+            }
+            
+        } catch (error) {
+            console.log(err)
+            res.status(500).json({success: false, msg: err})
+        }
+        
+        
+
+        // LEGACY
+        // redisClient.get(`WHITE_${payload.id}`).then(savedRefreshToken => {
         //     if (savedRefreshToken) {
         //         if (savedRefreshToken == clientRefreshToken) {
         //             // here refersh token is valid as it is in whitelist
@@ -116,35 +145,10 @@ const refreshToken = async (req, res) => {
         //         // null no refersh token of this user is whitelisted
         //         res.status(500).json({success: false, msg: "SEVERE SECURITY CONCERN"})
         //     }
-            
-        // } catch (error) {
+        // }).catch(err => {
         //     console.log(err)
         //     res.status(500).json({success: false, msg: err})
-        // }
-        
-        
-
-        // LEGACY
-        redisClient.get(`WHITE_${payload.id}`).then(savedRefreshToken => {
-            if (savedRefreshToken) {
-                if (savedRefreshToken == clientRefreshToken) {
-                    // here refersh token is valid as it is in whitelist
-                    // console.log(savedRefreshToken) //
-                    const accessToken = createAccessToken({id: payload._id})
-                    return res.json({ status: true, accessToken})
-
-                } else {
-                    // refersh token is invalid "USER HACKED"
-                    res.status(500).json({success: false, msg: "user logged out with this token but it is compromised"})
-                }
-            } else {
-                // null no refersh token of this user is whitelisted
-                res.status(500).json({success: false, msg: "SEVERE SECURITY CONCERN"})
-            }
-        }).catch(err => {
-            console.log(err)
-            res.status(500).json({success: false, msg: err})
-        })
+        // })
     
 
         

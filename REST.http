@@ -21,3 +21,7 @@ Content-Type: application/json
 
 ### get a user 
 GET http://localhost:5000/api/user/6217b58fb5a837fb8cb22de6
+
+
+###
+GET http://localhost:5000/trial

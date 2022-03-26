@@ -30,3 +30,12 @@ app.use('/api/auth', authRoutes)
 app.get("/secret", (req, _res) => {
     console.log(req)
 })
+
+
+app.get("/trial", async (req, res) => {
+    redisClient.set("names", JSON.stringify(['abc', 'xyz']))
+    const nameArray = await redisClient.get("names")
+    console.log(nameArray);
+    res.json({nameArray: JSON.parse(nameArray)})
+})
+
